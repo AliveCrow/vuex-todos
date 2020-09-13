@@ -28,6 +28,14 @@ export default new Vuex.Store({
         },
         confirmItem(state, item) {
             state.list[item.id].done = !state.list[item.id].done
+        },
+        deleteItem(state, item) {
+            //根据id查找对应的索引项
+            const i = state.list.findIndex(x => x.id === item.id)
+                //根据索引删除元素
+            if (i !== -1) {
+                state.list.splice(i, 1)
+            }
         }
     },
     actions: {
@@ -38,6 +46,11 @@ export default new Vuex.Store({
                 //因为只有mutation才能修改state中的数据
                 context.commit('initList', res.data)
             })
+        }
+    },
+    getters: {
+        residue(state) {
+            return state.list.filter(x => x.done === false).length
         }
     },
     modules: {}

@@ -17,17 +17,17 @@
             </div>
           </div>
           <ul>
-            <li class="item" @click="click1(item)" v-for="item in list">
+             <li class="item" @click="click1(item)" v-for="item in list">
               <div class="item-click" >
                 <input type="checkbox" :checked="item.done===true?true:false" style="margin:5px" value="bdsadbvasy" />
                 <span>{{item.info}}</span>
               </div>
-              <a @click.stop="click2">删除</a>
+              <a @click.stop="deletehandel(item)">删除</a>
             </li>
           </ul>
         </div>
         <div class="item-message">
-          <span>1条剩余</span>
+          <span>{{residue}}条剩余</span>
           <div class="result">
             <a>全部</a>
             <a class="middle">未完成</a>
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState,mapGetters } from 'vuex'
 export default {
   name: '',
   data() {
@@ -56,8 +56,8 @@ export default {
     click1(item) {
       this.$store.commit('confirmItem',item)
     },
-    click2() {
-      console.log('click2')
+    deletehandel(item) {
+      this.$store.commit('deleteItem',item)
     },
     //监听文本变化
     inputhandel (e) {
@@ -73,7 +73,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(['list','inputValue']),
+    ...mapState(['list','inputValue',]),
+    ...mapGetters(['residue'])
   },
 }
 </script>
@@ -108,19 +109,20 @@ a {
   flex-direction: column;
 }
 .empty-input{
-  border: 1px solid #F56C6C;
+  border: 1px solid #F56C6C!important;
   outline: none;
 }
 .add-item > input {
+  outline: none;
   padding: 5px;
   width: 400px;
   height: 2em;
   border-radius: 2px;
+  border: 1px solid #dcdfe6;
   &:hover {
     border: 1px solid #409eff;
   }
   &:focus {
-    border-radius: none !important;
     border: 2px solid #409eff;
   }
 }
