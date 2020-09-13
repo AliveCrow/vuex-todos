@@ -2,38 +2,59 @@
   <div id="app">
     <div class="container">
       <div class="add-item">
-        <input type="text" :class="empty?'empty-input':''"  @change="inputhandel" :value="inputValue"/>
+        <input
+          type="text"
+          :class="empty?'empty-input':''"
+          @change="inputhandel"
+          :value="inputValue"
+        />
         <button @click="addItem">添加事项</button>
       </div>
       <div class="items">
         <div class="cover-item">
-          <div class="cover" style="display:none">
+          <div class="no-todos" :style="todoNum?'':'display:none'">完成了所有todo</div>
+          <div class="cover" :style="show?'':'display:none'">
             <div class="comfirm">
               <span>确认删除？</span>
               <div>
-                <input type="button" value="confirm" class="confirm-btn" />
-                <input type="button" value="cancel" class="cancel-btn" />
+                <input
+                  type="button"
+                  value="confirm"
+                  class="confirm-btn"
+                  @click="deletehandel(itemData),show=false"
+                />
+                <input type="button" value="cancel" class="cancel-btn" @click="show =false" />
               </div>
             </div>
           </div>
           <ul>
-             <li class="item" @click="click1(item)" v-for="item in list">
-              <div class="item-click" >
-                <input type="checkbox" :checked="item.done===true?true:false" style="margin:5px" value="bdsadbvasy" />
+            <li class="item" @click="click1(item)" v-for="item in changeWhichCard">
+              <div class="item-click">
+                <input
+                  type="checkbox"
+                  :checked="item.done===true?true:false"
+                  style="margin:5px"
+                  value="bdsadbvasy"
+                />
                 <span>{{item.info}}</span>
               </div>
-              <a @click.stop="deletehandel(item)">删除</a>
+              <a @click.stop="show=true,itemData=item">删除</a>
+              <!-- deletehandel(item), -->
             </li>
           </ul>
         </div>
         <div class="item-message">
           <span>{{residue}}条剩余</span>
           <div class="result">
-            <a>全部</a>
-            <a class="middle">未完成</a>
-            <a>已完成</a>
+            <a @click="changeCard('all')" :class="class_name==='all'?'selected':''">全部</a>
+            <a
+              class="middle"
+              @click="changeCard('unfinished')"
+              :class="class_name==='unfinished'?'selected':''"
+            >未完成</a>
+            <a @click="changeCard('finish')" :class="class_name==='finish'?'selected':''">已完成</a>
           </div>
-          <a class="delete-finsh">删除已经完成</a>
+          <a class="delete-finsh" @click="deleteFinished">删除已经完成</a>
         </div>
       </div>
     </div>
@@ -41,12 +62,15 @@
 </template>
 
 <script>
-import { mapState,mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 export default {
   name: '',
   data() {
     return {
-      empty:false
+      empty: false,
+      class_name: 'all',
+      show: false,
+      itemData: {},
     }
   },
   created() {
@@ -54,27 +78,42 @@ export default {
   },
   methods: {
     click1(item) {
-      this.$store.commit('confirmItem',item)
+      this.$store.commit('confirmItem', item)
     },
     deletehandel(item) {
-      this.$store.commit('deleteItem',item)
+      // console.log(item)
+      this.$store.commit('deleteItem', item)
     },
     //监听文本变化
-    inputhandel (e) {
-      this.$store.commit('changeInput',e.target.value)
+    inputhandel(e) {
+      this.$store.commit('changeInput', e.target.value)
     },
-    addItem(){
-      if(this.inputValue.trim().length === 0){
+    addItem() {
+      if (this.inputValue.trim().length === 0) {
         this.$data.empty = true
-      }else{
+      } else {
         this.$data.empty = false
         this.$store.commit('addItem')
       }
-    }
+    },
+    changeCard(e) {
+      this.$data.class_name = e
+      this.$store.commit('changeSelected', e)
+    },
+    deleteFinished() {
+      this.$store.commit('deleteFinished')
+    },
   },
   computed: {
-    ...mapState(['list','inputValue',]),
-    ...mapGetters(['residue'])
+    ...mapState(['list', 'inputValue']),
+    ...mapGetters(['residue', 'changeWhichCard']),
+    todoNum(){
+      if(this.changeWhichCard.length === 0){
+        return true
+      }else{
+        return false
+      }
+    }
   },
 }
 </script>
@@ -103,13 +142,14 @@ a {
   left: 50%;
   transform: translate(-50%, -50%);
   max-width: 400px;
+  max-height: 600px;
   margin-left: auto;
   margin-right: auto;
   display: flex;
   flex-direction: column;
 }
-.empty-input{
-  border: 1px solid #F56C6C!important;
+.empty-input {
+  border: 1px solid #f56c6c !important;
   outline: none;
 }
 .add-item > input {
@@ -123,7 +163,7 @@ a {
     border: 1px solid #409eff;
   }
   &:focus {
-    border: 2px solid #409eff;
+    border: 2px solid #409eff !important;
   }
 }
 .add-item > button {
@@ -185,6 +225,10 @@ a {
   padding: 7px 10px;
   color: #000;
 }
+.selected {
+  color: #fff !important;
+  background-color: #409eff;
+}
 .result > a:hover {
   color: #fff;
   background-color: #409eff;
@@ -209,7 +253,30 @@ a {
 }
 .cover-item {
   position: relative;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  max-height: 400px;
 }
+//滚动条样式
+
+.cover-item::-webkit-scrollbar {
+  /*滚动条整体样式*/
+  width : 2px;  /*高宽分别对应横竖滚动条的尺寸*/
+  height: 1px;
+  }
+  .cover-item::-webkit-scrollbar-thumb {
+  /*滚动条里面小方块*/
+  border-radius: none;
+  box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background   : #535353;
+  }
+  .cover-item::-webkit-scrollbar-track {
+  /*滚动条里面轨道*/
+  box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: none;
+  background   : #ededed;
+  }
+
 .comfirm {
   background-color: #fff;
   border: 1px solid #ebeef5;
@@ -229,22 +296,30 @@ a {
     margin: 0 5px;
     font-size: 0.9em;
     padding: 5px 9px;
-      border: 1px solid #dcdfe6;
+    border: 1px solid #dcdfe6;
   }
 }
-.cancel-btn{
-
+.cancel-btn {
   &:hover {
     background-color: #909399;
     color: #fff;
   }
 }
 .confirm-btn {
-  
   color: #000;
   &:hover {
     color: #fff;
     background-color: #f56c6c;
   }
+}
+.cover-item {
+  min-height: 160px;
+}
+.no-todos {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>

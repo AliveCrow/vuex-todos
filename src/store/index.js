@@ -8,7 +8,8 @@ export default new Vuex.Store({
     state: {
         inputValue: '',
         list: [],
-        indexId: 4
+        indexId: 4,
+        selected: 'all'
     },
     mutations: {
         initList(state, listData) {
@@ -27,7 +28,11 @@ export default new Vuex.Store({
             state.inputValue = ''
         },
         confirmItem(state, item) {
-            state.list[item.id].done = !state.list[item.id].done
+            const i = state.list.findIndex(x => x.id === item.id)
+            if (i !== -1) {
+                state.list[i].done = !state.list[i].done
+            }
+
         },
         deleteItem(state, item) {
             //根据id查找对应的索引项
@@ -36,6 +41,13 @@ export default new Vuex.Store({
             if (i !== -1) {
                 state.list.splice(i, 1)
             }
+        },
+        deleteFinished(state) {
+            const i = state.list.filter(x => x.done === false)
+            state.list = i
+        },
+        changeSelected(state, e) {
+            state.selected = e
         }
     },
     actions: {
@@ -51,7 +63,18 @@ export default new Vuex.Store({
     getters: {
         residue(state) {
             return state.list.filter(x => x.done === false).length
+        },
+        changeWhichCard(state) {
+            if (state.selected === 'all') {
+                return state.list
+            } else if (state.selected === 'unfinished') {
+                console.log('unfinished');
+                return state.list.filter(x => x.done === false)
+            } else if (state.selected === 'finish') {
+                return state.list.filter(x => x.done === true)
+            }
         }
+
     },
     modules: {}
 })
