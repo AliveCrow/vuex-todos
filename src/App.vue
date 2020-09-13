@@ -2,7 +2,7 @@
   <div id="app">
     <div class="container">
       <div class="add-item">
-        <input type="text"  @change="inputhandel" />
+        <input type="text" :class="empty?'empty-input':''"  @change="inputhandel" :value="inputValue"/>
         <button @click="addItem">添加事项</button>
       </div>
       <div class="items">
@@ -45,14 +45,16 @@ import { mapState } from 'vuex'
 export default {
   name: '',
   data() {
-    return {}
+    return {
+      empty:false
+    }
   },
   created() {
     this.$store.dispatch('getList')
   },
   methods: {
     click1(item) {
-      console.log(item)
+      this.$store.commit('confirmItem',item)
     },
     click2() {
       console.log('click2')
@@ -61,8 +63,13 @@ export default {
     inputhandel (e) {
       this.$store.commit('changeInput',e.target.value)
     },
-    addItem(e){
-      this.$store.commit('addItem')
+    addItem(){
+      if(this.inputValue.trim().length === 0){
+        this.$data.empty = true
+      }else{
+        this.$data.empty = false
+        this.$store.commit('addItem')
+      }
     }
   },
   computed: {
@@ -100,11 +107,15 @@ a {
   display: flex;
   flex-direction: column;
 }
+.empty-input{
+  border: 1px solid #F56C6C;
+  outline: none;
+}
 .add-item > input {
   padding: 5px;
   width: 400px;
   height: 2em;
-  border: 1px solid #dcdfe6;
+  border-radius: 2px;
   &:hover {
     border: 1px solid #409eff;
   }
@@ -124,6 +135,7 @@ a {
   margin-left: 20px;
   padding: 0 10px;
 }
+
 .items {
   margin-top: 10px;
   border: 1px solid #dcdfe6;

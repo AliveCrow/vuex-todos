@@ -20,10 +20,14 @@ export default new Vuex.Store({
         addItem(state) {
             state.list.push({
                 id: state.indexId,
-                info: state.inputValue,
+                info: state.inputValue.trim(),
                 done: false
             })
-            state.indexId++
+            state.indexId++;
+            state.inputValue = ''
+        },
+        confirmItem(state, item) {
+            state.list[item.id].done = !state.list[item.id].done
         }
     },
     actions: {
