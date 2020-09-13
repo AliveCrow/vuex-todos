@@ -2,19 +2,30 @@
   <div id="app">
     <div class="container">
       <div class="add-item">
-        <input type="text" />
-        <button>添加事项</button>
+        <input type="text"  @change="inputhandel" />
+        <button @click="addItem">添加事项</button>
       </div>
       <div class="items">
-        <ul>
-          <li class="item" @click="click1">
-            <div class="item-click">
-              <input type="checkbox" style="margin:5px" value="bdsadbvasy" />
-              <span>bdsadbvasy</span>
+        <div class="cover-item">
+          <div class="cover" style="display:none">
+            <div class="comfirm">
+              <span>确认删除？</span>
+              <div>
+                <input type="button" value="confirm" class="confirm-btn" />
+                <input type="button" value="cancel" class="cancel-btn" />
+              </div>
             </div>
-            <a @click.stop="click2">删除</a>
-          </li>
-        </ul>
+          </div>
+          <ul>
+            <li class="item" @click="click1(item)" v-for="item in list">
+              <div class="item-click" >
+                <input type="checkbox" :checked="item.done===true?true:false" style="margin:5px" value="bdsadbvasy" />
+                <span>{{item.info}}</span>
+              </div>
+              <a @click.stop="click2">删除</a>
+            </li>
+          </ul>
+        </div>
         <div class="item-message">
           <span>1条剩余</span>
           <div class="result">
@@ -30,18 +41,32 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: '',
   data() {
     return {}
   },
+  created() {
+    this.$store.dispatch('getList')
+  },
   methods: {
-    click1() {
-      console.log('click1')
+    click1(item) {
+      console.log(item)
     },
     click2() {
       console.log('click2')
     },
+    //监听文本变化
+    inputhandel (e) {
+      this.$store.commit('changeInput',e.target.value)
+    },
+    addItem(e){
+      this.$store.commit('addItem')
+    }
+  },
+  computed: {
+    ...mapState(['list','inputValue']),
   },
 }
 </script>
@@ -102,6 +127,7 @@ a {
 .items {
   margin-top: 10px;
   border: 1px solid #dcdfe6;
+  position: relative;
 }
 .item {
   cursor: pointer;
@@ -116,8 +142,15 @@ a {
     // box-shadow: inset 0px 0px 9px -3px rgba(0,0,0,0.36);
     box-shadow: 0px 0px 4px 2px rgba(96, 98, 102, 0.15);
   }
+  a {
+    min-width: 30px;
+  }
 }
-
+.item-click {
+  display: flex;
+  margin-right: 10px;
+  color: #606266;
+}
 .item-message {
   display: flex;
   flex-direction: row;
@@ -148,5 +181,56 @@ a {
 }
 .delete-finsh {
   font-size: 0.8em;
+}
+.cover {
+  background-color: rgba($color: #000, $alpha: 0.2);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(2px);
+}
+.cover-item {
+  position: relative;
+}
+.comfirm {
+  background-color: #fff;
+  border: 1px solid #ebeef5;
+  border-radius: 5px;
+  height: 50%;
+  width: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 99;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  input {
+    margin: 0 5px;
+    font-size: 0.9em;
+    padding: 5px 9px;
+      border: 1px solid #dcdfe6;
+  }
+}
+.cancel-btn{
+
+  &:hover {
+    background-color: #909399;
+    color: #fff;
+  }
+}
+.confirm-btn {
+  
+  color: #000;
+  &:hover {
+    color: #fff;
+    background-color: #f56c6c;
+  }
 }
 </style>
