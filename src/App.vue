@@ -1,6 +1,20 @@
 <template>
   <div id="app">
     <div class="container">
+      <div class="cover" :style="show?'':'display:none'">
+        <div class="comfirm">
+          <span>确认删除？</span>
+          <div>
+            <input
+              type="button"
+              value="confirm"
+              class="confirm-btn"
+              @click="deletehandel(itemData),show=false"
+            />
+            <input type="button" value="cancel" class="cancel-btn" @click="show =false" />
+          </div>
+        </div>
+      </div>
       <div class="add-item">
         <input
           type="text"
@@ -13,20 +27,6 @@
       <div class="items">
         <div class="cover-item">
           <div class="no-todos" :style="todoNum?'':'display:none'">完成了所有todo</div>
-          <div class="cover" :style="show?'':'display:none'">
-            <div class="comfirm">
-              <span>确认删除？</span>
-              <div>
-                <input
-                  type="button"
-                  value="confirm"
-                  class="confirm-btn"
-                  @click="deletehandel(itemData),show=false"
-                />
-                <input type="button" value="cancel" class="cancel-btn" @click="show =false" />
-              </div>
-            </div>
-          </div>
           <ul>
             <li class="item" @click="click1(item)" v-for="item in changeWhichCard">
               <div class="item-click">
@@ -107,13 +107,13 @@ export default {
   computed: {
     ...mapState(['list', 'inputValue']),
     ...mapGetters(['residue', 'changeWhichCard']),
-    todoNum(){
-      if(this.changeWhichCard.length === 0){
+    todoNum() {
+      if (this.changeWhichCard.length === 0) {
         return true
-      }else{
+      } else {
         return false
       }
-    }
+    },
   },
 }
 </script>
@@ -245,10 +245,10 @@ a {
   height: 100%;
   width: 100%;
   position: absolute;
+  transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
   z-index: 10;
-  transform: translate(-50%, -50%);
   backdrop-filter: blur(2px);
 }
 .cover-item {
@@ -261,27 +261,27 @@ a {
 
 .cover-item::-webkit-scrollbar {
   /*滚动条整体样式*/
-  width : 2px;  /*高宽分别对应横竖滚动条的尺寸*/
+  width: 2px; /*高宽分别对应横竖滚动条的尺寸*/
   height: 1px;
-  }
-  .cover-item::-webkit-scrollbar-thumb {
+}
+.cover-item::-webkit-scrollbar-thumb {
   /*滚动条里面小方块*/
   border-radius: none;
-  box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
-  background   : #535353;
-  }
-  .cover-item::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background: #535353;
+}
+.cover-item::-webkit-scrollbar-track {
   /*滚动条里面轨道*/
-  box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
   border-radius: none;
-  background   : #ededed;
-  }
+  background: #ededed;
+}
 
 .comfirm {
   background-color: #fff;
   border: 1px solid #ebeef5;
   border-radius: 5px;
-  height: 50%;
+  height: 30%;
   width: 50%;
   position: absolute;
   top: 50%;
@@ -313,7 +313,8 @@ a {
   }
 }
 .cover-item {
-  min-height: 160px;
+  min-height: 200px;
+  position: relative;
 }
 .no-todos {
   position: absolute;
